@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { View, Text } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import { Button, Loading } from '../components/common/';
+import { MapView } from "expo";
 import axios from 'axios';
 
 export default class LoggedIn extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
       loading: true,
@@ -13,7 +14,7 @@ export default class LoggedIn extends Component {
     }
   }
 
-  componentDidMount(){
+  componentDidMount() {
     const headers = {
       'x-auth-token': this.props.token
     };
@@ -22,7 +23,8 @@ export default class LoggedIn extends Component {
       method: 'GET',
       url: 'http://localhost:3000/Dapi/driver',
       headers: headers,
-    }).then((response) => {response.data
+    }).then((response) => {
+      response.data
       this.setState({
         data: response.data,
         loading: false
@@ -40,32 +42,25 @@ export default class LoggedIn extends Component {
   }
 
   render() {
-    const { contalsiner, emailText, errorText } = styles;
+    const { container, emailText, errorText } = styles;
     const { loading, data, error } = this.state;
 
-    if (loading){
-      return(
+    if (loading) {
+      return (
         <View style={container}>
           <Loading size={'large'} />
         </View>
       )
     } else {
-        return(
-          <View style={container}>
-            <View>
-              {email ?
-                <Text style={emailText}>
-                  Your email: {email}
-                </Text>
-                :
-                <Text style={errorText}>
-                  {error}
-                </Text>}
-            </View>
-            <Button onPress={this.props.deleteJWT}>
-              Log Out
-            </Button>
+      return (
+        <View style={container}>
+          <View>
+
           </View>
+          <Button onPress={this.props.deleteJWT}>
+            Log Out
+            </Button>
+        </View>
       );
     }
   }
