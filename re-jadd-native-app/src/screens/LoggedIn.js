@@ -8,25 +8,30 @@ export default class LoggedIn extends Component {
     super(props);
     this.state = {
       loading: true,
-      email: '',
+      location: '',
       error: ''
     }
   }
 
   componentDidMount(){
     const headers = {
-      'Authorization': 'Bearer ' + this.props.jwt
+      'x-auth-token': this.props.token
     };
+    // console.error(headers);
     axios({
       method: 'GET',
       url: 'http://localhost:3000/Dapi/driver',
       headers: headers,
-    }).then((response) => {
+    }).then((response) => {response.data
       this.setState({
-        email: response.data.email,
+        data: response.data,
         loading: false
       });
+      console.log("/n/n/n/n/", "lajkhsa", Object.keys(response.data).join(', '))
+      // console.log(response)
+      console.log(this.state.data)
     }).catch((error) => {
+
       this.setState({
         error: 'Error retrieving data',
         loading: false
@@ -35,8 +40,8 @@ export default class LoggedIn extends Component {
   }
 
   render() {
-    const { container, emailText, errorText } = styles;
-    const { loading, email, error } = this.state;
+    const { contalsiner, emailText, errorText } = styles;
+    const { loading, data, error } = this.state;
 
     if (loading){
       return(

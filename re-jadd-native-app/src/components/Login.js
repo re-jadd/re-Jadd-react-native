@@ -29,8 +29,8 @@ class Login extends Component {
         password: password
     })
     .then((response) => {
-      deviceStorage.saveKey("id_token", response.data.jwt);
-      this.props.newJWT(response.data.jwt);
+      deviceStorage.saveKey("id_token", response.data.token);
+      this.props.newJWT(response.data.token);
     })
     .catch((error) => {
       console.log(error);

@@ -5,12 +5,14 @@ import axios from 'axios';
 import deviceStorage from '../services/deviceStorage';
 
 class Registration extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
       email: '',
+      name: '',
       password: '',
-      password_confirmation: '',
+      location: '',
+      phone: '',
       error: '',
       loading: false
     };
@@ -20,26 +22,30 @@ class Registration extends Component {
   }
 
   registerUser() {
-    const { email, password, password_confirmation } = this.state;
+    const { email, name, password, location, phone } = this.state;
 
     this.setState({ error: '', loading: true });
 
     // NOTE Post to HTTPS only in production
-    axios.post("http://localhost:3000/Dapi/users",{
-      user: {
-        email: email,
-        password: password,
-        password_confirmation: password_confirmation
-      }
-    },)
-    .then((response) => {
-      deviceStorage.saveKey("id_token", response.data.jwt);
-      this.props.newJWT(response.data.jwt);
+    axios.post("http://localhost:3000/Dapi/users", {
+      email: email,
+      name: name,
+      password: password,
+      location: location,
+      phone: phone
     })
-    .catch((error) => {
-      console.log(error);
-      this.onRegistrationFail();
-    });
+      .then((response) =>response.json())
+      .then(data => {
+        console.log(data);
+        deviceStorage.saveKey("id_token", data.token);
+        this.props.newJWT(data.token);
+
+      })
+
+      .catch((error) => {
+        console.log(error);
+        this.onRegistrationFail();
+      });
   }
 
   onRegistrationFail() {
@@ -50,8 +56,10 @@ class Registration extends Component {
   }
 
   render() {
-    const { email, password, password_confirmation, error, loading } = this.state;
+    const { email, name, password, location, phone, error, loading } = this.state;
     const { form, section, errorTextStyle } = styles;
+
+
 
     return (
       <Fragment>
@@ -64,7 +72,22 @@ class Registration extends Component {
               onChangeText={email => this.setState({ email })}
             />
           </View>
-
+          <View style={section}>
+            <Input
+              placeholder="name"
+              label="name"
+              value={name}
+              onChangeText={name => this.setState({ name })}
+            />
+          </View>
+          <View style={section}>
+            <Input
+              placeholder="phone"
+              label="phone"
+              value={phone}
+              onChangeText={phone => this.setState({ phone })}
+            />
+          </View>
           <View style={section}>
             <Input
               secureTextEntry
@@ -77,11 +100,10 @@ class Registration extends Component {
 
           <View style={section}>
             <Input
-              secureTextEntry
-              placeholder="confirm password"
-              label="Confirm Password"
-              value={password_confirmation}
-              onChangeText={password_confirmation => this.setState({ password_confirmation })}
+              placeholder="location"
+              label="location"
+              value={location}
+              onChangeText={location => this.setState({ location })}
             />
           </View>
 
