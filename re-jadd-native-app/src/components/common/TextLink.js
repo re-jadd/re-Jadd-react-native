@@ -17,10 +17,10 @@ const TextLink = ({ onPress, children }) => {
 const styles = {
   text: {
     alignSelf: 'center',
-    color: 'blue',
+    color: 'rgb(104, 212, 185)',
     fontSize: 18,
     fontWeight: '700',
-    textDecorationLine: 'underline',
+    textDecorationLine: 'none',
     paddingTop: 10,
     paddingBottom: 10
   },

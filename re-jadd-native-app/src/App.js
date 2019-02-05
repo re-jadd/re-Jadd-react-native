@@ -8,7 +8,7 @@ export default class App extends Component {
   constructor() {
     super();
     this.state = {
-      jwt: '',
+      token: '',
       loading: true
     }
 
@@ -20,7 +20,7 @@ export default class App extends Component {
 
   newJWT(jwt){
     this.setState({
-      jwt: jwt
+      token: jwt
     });
   }
 
@@ -29,13 +29,13 @@ export default class App extends Component {
       return (
         <Loading size={'large'} />
        );
-    } else if (!this.state.jwt) {
+    } else if (!this.state.token) {
       return (
         <Auth newJWT={this.newJWT} />
       );
-    } else if (this.state.jwt) {
+    } else if (this.state.token) {
       return (
-        <LoggedIn jwt={this.state.jwt} deleteJWT={this.deleteJWT} />
+        <LoggedIn token={this.state.token} deleteJWT={this.deleteJWT} />
       );
     }
   }
