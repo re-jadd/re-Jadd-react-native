@@ -40,7 +40,7 @@ export default class LoggedIn extends Component {
   }
 
   render() {
-    const { container, emailText, errorText } = styles;
+    const { contalsiner, emailText, errorText } = styles;
     const { loading, data, error } = this.state;
 
     if (loading){
