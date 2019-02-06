@@ -1,36 +1,11 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { View, Text } from 'react-native';
 import { Button, Loading } from '../components/common/';
-import { CurrentLocation } from '../components/CurrentLocation';
-import { MapView, Location, Permissions } from "expo";
+import { MapView } from "expo";
 import axios from 'axios';
-
-// const fakedata = [
-//    {
-//     driver_id: 1,
-//     id: 1,
-//     location:  {
-//       x: 24.666352,
-//       y: 46.674326,
-//     },
-//     size: 15,
-//     state_order: processing,
-//     type: Medium,
-//     user_id: 1,
-//   },
-//    {
-//     driver_id: 2,
-//     id: 2,
-//     location:  {
-//       x: 24.663232,
-//       y: 46.673658,
-//     },
-//     size: 15,
-//     state_order: processing,
-//     type: Medium,
-//     user_id: 1
-//   }
-// ]
+import Polyline from '@mapbox/polyline';
+import getDirections from 'react-native-google-maps-directions'
+import { Icon } from 'react-native-elements'
 export default class LoggedIn extends Component {
   constructor(props) {
     super(props);
@@ -48,12 +23,18 @@ export default class LoggedIn extends Component {
       locationResult: null,
       location: { coords: { latitude: null, longitude: null } },
       orderLocation: { coords: { latitude: 24, longitude: 46 } },
+      Coordinates: [],
+      distanceTravelled: 0,
+
     }
+    this.getDirections = this.getDirections.bind(this)
+    this.handleGetDirections = this.handleGetDirections.bind(this)
   }
   componentDidMount() {
     this.fetchallorder()
     // this._getLocationAsync();
     this.CurrentLocation()
+
   }
 
 
@@ -74,7 +55,7 @@ export default class LoggedIn extends Component {
       })
       this.allordermarker()
 
-      console.log("/n/n/n/n/", "lajkhsa", Object.keys(response.data).join(', '))
+      console.log("\n\n\n\n\n", "lajkhsa", Object.keys(response.data).join(', '))
       // console.log(response)
       console.log(this.state.data)
     }).catch((error) => {
@@ -85,7 +66,27 @@ export default class LoggedIn extends Component {
       });
     });
   }
+  async getDirections(driverloc, orderloc) {
+    try {
+      let resp = await fetch(
+        `http://MAP_TYPES.googleapis.com/maps/api/directions/json?origin=${driverloc}&destination=${orderloc}&mode=walking&key=AIzaSyDD-SoH6u8iFqWUzUK2d-IGNuDBgkP8bws
+`  );
+      let respJson = await resp.json();
+      let points = Polyline.decode(respJson.routs[0].overview_polyline.points);
+      let coords = points.map((point, index) => {
+        return {
+          latitude: point[0],
+          longitude: point[1]
 
+        }
+      })
+      const newCoords = [...this.state.coordinate, coords];
+      this.setState({ coordinate: newCoords })
+      return coords
+    } catch (error) {
+      return error
+    }
+  }
   // _getLocationAsync = async () => {
   //   let { status } = await Permissions.askAsync(Permissions.LOCATION);
   //   if (status !== 'granted') {
@@ -132,7 +133,13 @@ export default class LoggedIn extends Component {
         order: response.data,
         loading: false
       })
-      console.log("/n/n/n/n/", "lajkhsa", Object.keys(response.data).join(', '))
+      this.getDirections(
+        this.order.userlocation.x,
+        this.order.userlocation.y,
+        this.state.mapRegion.latitude,
+        this.state.mapRegion.longitude,
+      )
+      console.log("\n\n\n\n\n", "lajkhsa", Object.keys(response.data).join(', '))
       // console.log(response)
       console.log(this.state.order)
     }).catch((error) => {
@@ -149,6 +156,9 @@ export default class LoggedIn extends Component {
   CurrentLocation() {
     this.watchId = navigator.geolocation.watchPosition(
       (position) => {
+        if (postion == this.state.order.userlocation) {
+
+        }
         this.setState({
           location: {
             coords: {
@@ -163,7 +173,6 @@ export default class LoggedIn extends Component {
       { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000, distanceFilter: 10 },
     );
   }
-
   componentWillUnmount() {
     navigator.geolocation.clearWatch(this.watchId);
   }
@@ -181,22 +190,56 @@ export default class LoggedIn extends Component {
     }
   }
 
-  renderPhone(){
-    if(this.state.order !== ''){
-    return (
-      <View>
-            <Text>
-            Phone call: {this.state.order.userphone}
-            </Text>
-            <Button onPress={this.props.deleteJWT}>
+  renderPhone() {
+
+    if (this.state.order !== '') {
+      return (
+        <View>
+          <View
+          
+          >
+          <Icon
+            name='call'
+            />
+          <Text>
+            {this.state.order.userphone}
+          </Text>
+          </View>
+          <Button onPress={this.handleGetDirections}>
             Start tracking
           </Button>
-          </View>
-    )}
+        </View>
+      )
+    }
   }
+  handleGetDirections = () => {
+    const data = {
+      source: {
+        latitude: -33.8356372,
+        longitude: 18.6947617
+      },
+      destination: {
+        latitude: -33.8600024,
+        longitude: 18.697459
+      },
+      params: [
+        {
+          key: "travelmode",
+          value: "driving"        // may be "walking", "bicycling" or "transit" as well
+        },
+        {
+          key: "dir_action",
+          value: "navigate"       // this instantly initializes navigation using the given travel mode 
+        }
+      ]
+    }
+
+    getDirections(data)
+  }
+
   render() {
     const { container, emailText, errorText } = styles;
-    const { loading, data, error, order } = this.state;
+    const { loading, data, error, coordinates } = this.state;
 
     if (loading) {
       return (
@@ -220,10 +263,6 @@ export default class LoggedIn extends Component {
           // onRegionChange={this._handleMapRegionChange}
           >
 
-            {/* <orderPlace
-allordermarker
-
-/> */}
 
             {data.map((marker, index) => {
               return (<MapView.Marker
@@ -231,31 +270,42 @@ allordermarker
                 coordinate={this.formatLocation(marker.location.x, marker.location.y)}
                 title={marker.state_order}
                 description={marker.type}
-                onPress={() => {this.fetchOrder(marker.id)}}
+                onPress={() => { this.fetchOrder(marker.id) }}
 
               // onPress={}
               />)
             })}
 
 
-            <MapView.Marker
+            <MapView.Marker.Animated
               image={require('../../assets/icon.png')}
               coordinate={this.state.mapRegion}
               title="Your Location"
               description="Some description"
             />
 
+            {/* {coordinates !== '' ? coordinates.map((coords, index) => (
+              <MapView.Polyline
+                key={index}
+                index={index}
+                coordinates={coords}
+                strokeWidth={2}
+                strokColor="blue"
+
+              />
+            )) : ''} */}
+
+
+
           </MapView>
 
-          <View>
 
-          </View>
           <Button onPress={this.props.deleteJWT}>
             Log Out
           </Button>
-
-          {this.renderPhone()}
- 
+          <View>
+            {this.renderPhone()}
+          </View>
         </View>
       );
     }
