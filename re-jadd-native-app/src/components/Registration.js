@@ -34,13 +34,10 @@ class Registration extends Component {
       location: location,
       phone: phone
     })
-      .then((response) =>response.json())
-      .then(data => {
-        console.log(data);
-        deviceStorage.saveKey("id_token", data.token);
-        this.props.newJWT(data.token);
-
-      })
+    .then((response) => {
+      deviceStorage.saveKey("id_token", response.data.token);
+      this.props.newJWT(response.data.token);
+    })
 
       .catch((error) => {
         console.log(error);
