@@ -23,7 +23,19 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.re-jadd",
+      "config": {
+        "googleMapsApiKey": "AIzaSyDD-SoH6u8iFqWUzUK2d-IGNuDBgkP8bws"
+      }
+    },
+    "android": {
+      "package": "com.codingmechanic.mapcuny",
+      "config": {
+        "googleMaps": {
+          "apiKey": "<AIzaSyDD-SoH6u8iFqWUzUK2d-IGNuDBgkP8bws>"
+        }
+      }
     }
   }
 }
